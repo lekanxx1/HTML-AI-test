@@ -14,5 +14,8 @@
     "ndencies\""
   ],
   "author": "lekan",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "googleapis": "^143.0.0"
+  }
 }
