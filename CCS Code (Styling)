@@ -1,0 +1,25 @@
+body {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    padding: 20px;
+}
+
+#book-content {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+#feedback {
+    margin-top: 20px;
+    color: red;
+}
+
+#transcription {
+    margin-top: 20px;
+    color: green;
+}
+
+button {
+    padding: 10px 20px;
+    font-size: 16px;
+}

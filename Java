@@ -1,0 +1,80 @@
+const startButton = document.getElementById('start-reading');
+const stopButton = document.getElementById('stop-reading');
+const currentParagraph = document.getElementById('current-paragraph');
+const feedbackList = document.getElementById('feedback-list');
+
+let recognition;
+let isReading = false;
+
+if ('webkitSpeechRecognition' in window) {
+    recognition = new webkitSpeechRecognition();
+    recognition.continuous = true;
+    recognition.interimResults = true;
+
+    recognition.onresult = (event) => {
+        const result = event.results[event.results.length - 1];
+        const transcript = result[0].transcript.trim().toLowerCase();
+        
+        checkPronunciation(transcript);
+    };
+
+    recognition.onerror = (event) => {
+        console.error('Speech recognition error', event.error);
+    };
+} else {
+    console.error('Web Speech API is not supported in this browser');
+    startButton.disabled = true;
+    alert('Speech recognition is not supported in your browser. Please try using Google Chrome.');
+}
+
+startButton.addEventListener('click', () => {
+    if (!isReading) {
+        isReading = true;
+        recognition.start();
+        startButton.disabled = true;
+        stopButton.disabled = false;
+    }
+});
+
+stopButton.addEventListener('click', () => {
+    if (isReading) {
+        isReading = false;
+        recognition.stop();
+        startButton.disabled = false;
+        stopButton.disabled = true;
+    }
+});
+
+function checkPronunciation(transcript) {
+    const words = currentParagraph.textContent.split(' ');
+    const spokenWords = transcript.split(' ');
+
+    spokenWords.forEach((spokenWord, index) => {
+        if (words[index] && spokenWord !== words[index].toLowerCase()) {
+            provideFeedback(`Mispronounced "${words[index]}". You said "${spokenWord}".`);
+        }
+    });
+}
+
+function provideFeedback(message) {
+    const feedbackItem = document.createElement('li');
+    feedbackItem.textContent = message;
+    feedbackList.appendChild(feedbackItem);
+}
+
+// Simulating turning pages (you'd need to implement this fully with a backend)
+let currentPage = 0;
+const bookContent = [
+    "These two very old people are the father and mother of Mr. Bucket. Their names are Grandpa Joe and Grandma Josephine.",
+    "And these two very old people are the father and mother of Mrs. Bucket. Their names are Grandpa George and Grandma Georgina.",
+    "This is Mr. Bucket. This is Mrs. Bucket. Mr. and Mrs. Bucket have a small boy whose name is Charlie Bucket.",
+    "This is Charlie. How d'you do? And how d'you do? And how d'you do again? He is pleased to meet you."
+];
+
+function turnPage() {
+    currentPage = (currentPage + 1) % bookContent.length;
+    currentParagraph.textContent = bookContent[currentPage];
+    feedbackList.innerHTML = '';
+}
+
+// Call turnPage() when you want to move to the next paragraph

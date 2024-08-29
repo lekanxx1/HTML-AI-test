@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Charlie and the Chocolate Factory - Read Aloud</title>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; padding: 20px; }
+        #book-content { max-width: 800px; margin: 0 auto; }
+        #feedback { margin-top: 20px; color: red; }
+    </style>
+</head>
+<body>
+    <div id="book-content">
+        <h1>Charlie and the Chocolate Factory</h1>
+        <p id="current-paragraph">
+            These two very old people are the father and mother of Mr Bucket. Their names are Grandpa Joe and Grandma Josephine.
+        </p>
+        <button id="start-reading">Start Reading</button>
+        <div id="feedback"></div>
+    </div>
+
+    <script>
+        let recognition;
+        let isReading = false;
+        const startButton = document.getElementById('start-reading');
+        const feedback = document.getElementById('feedback');
+        const currentParagraph = document.getElementById('current-paragraph');
+
+        startButton.addEventListener('click', toggleReading);
+
+        function toggleReading() {
+            if (isReading) {
+                recognition.stop();
+                startButton.textContent = 'Start Reading';
+                isReading = false;
+            } else {
+                startReading();
+                startButton.textContent = 'Stop Reading';
+                isReading = true;
+            }
+        }
+
+        function startReading() {
+            if (!recognition) {
+                recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+                recognition.lang = 'en-US';
+                recognition.interimResults = false;
+                recognition.maxAlternatives = 1;
+
+                recognition.onresult = (event) => {
+                    const spokenText = event.results[0][0].transcript.toLowerCase();
+                    checkPronunciation(spokenText);
+                };
+
+                recognition.onerror = (event) => {
+                    console.error('Speech recognition error', event.error);
+                    feedback.textContent = 'Error: ' + event.error;
+                };
+            }
+
+            recognition.start();
+        }
+
+        function checkPronunciation(spokenText) {
+            const correctText = currentParagraph.textContent.toLowerCase();
+            const spokenWords = spokenText.split(' ');
+            const correctWords = correctText.split(' ');
+
+            let mispronounced = [];
+
+            spokenWords.forEach((word, index) => {
+                if (word !== correctWords[index]) {
+                    mispronounced.push(correctWords[index]);
+                }
+            });
+
+            if (mispronounced.length > 0) {
+                feedback.textContent = `Mispronounced words: ${mispronounced.join(', ')}`;
+            } else {
+                feedback.textContent = 'Great job! All words pronounced correctly.';
+            }
+        }
+    </script>
+</body>
+</html>
